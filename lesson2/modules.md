@@ -26,12 +26,13 @@
 
 В начале каждого файла можно указать, к какому пакету он относится:
 
-kotlin
-
+```kotlin
 // файл: src/main/kotlin/geometry/rectangle.kt
 package geometry
+
 fun perimeter(width: Double, height: Double): Double = 2 * (width + height)
 fun area(width: Double, height: Double): Double = width * height
+```
 
 Если пакет не указан, код попадает в **default package** (не рекомендуется для больших проектов).
 
@@ -39,32 +40,32 @@ fun area(width: Double, height: Double): Double = width * height
 
 Пакеты могут быть вложенными. Например, `geometry.figures` — это подпакет `geometry`. На диске это соответствует структуре папок.
 
-text
-
+```text
 src/
-main/
-kotlin/
-geometry/
-rectangle.kt   (package geometry)
-circle.kt      (package geometry)
-math/
-algebra.kt     (package math)
+  main/
+    kotlin/
+      geometry/
+        rectangle.kt   (package geometry)
+        circle.kt      (package geometry)
+      math/
+        algebra.kt     (package math)
+
+```
 
 ### Использование кода из другого пакета
 
 Чтобы использовать функции из другого пакета, нужно либо указать полное имя, либо сделать импорт.
 
-kotlin
-
+```kotlin
 // файл: src/main/kotlin/main.kt
 package main
 import geometry.area               // импорт конкретной функции
 import geometry.perimeter          // можно импортировать несколько
 fun main() {
-val w = 5.0
-val h = 3.0
-println("Площадь: ${area(w, h)}")
-println("Периметр: ${perimeter(w, h)}")
+    val w = 5.0
+    val h = 3.0
+    println("Площадь: ${area(w, h)}")
+    println("Периметр: ${perimeter(w, h)}")
 }
 
 Или без импорта:
@@ -72,8 +73,10 @@ println("Периметр: ${perimeter(w, h)}")
 kotlin
 
 fun main() {
-println("Площадь: ${geometry.area(5.0, 3.0)}")
+    println("Площадь: ${geometry.area(5.0, 3.0)}")
 }
+```
+
 
 ---
 
@@ -97,8 +100,8 @@ Top-level — это объявления (функции, переменные)
 
 Создадим пакет `geometry` с двумя файлами. Один файл будет содержать открытую часть, другой — внутренние детали.
 
-kotlin
 
+```kotlin
 // geometry/rectangle.kt
 package geometry
 // Открытая функция — public по умолчанию
@@ -107,15 +110,16 @@ fun rectangleArea(width: Double, height: Double): Double = width * height
 private fun validatePositive(value: Double): Boolean = value > 0
 // Используем private функцию внутри файла
 fun safeRectangleArea(width: Double, height: Double): Double? {
-return if (validatePositive(width) && validatePositive(height)) {
-width * height
-} else {
-null
+    return if (validatePositive(width) && validatePositive(height)) {
+        width * height
+    } else {
+        null
+    }
 }
-}
+```
 
-kotlin
 
+```kotlin
 // geometry/circle.kt
 package geometry
 import kotlin.math.PI
@@ -123,11 +127,12 @@ import kotlin.math.PI
 fun circleArea(radius: Double): Double = PI * radius * radius
 // internal функция — доступна только в пределах модуля компиляции
 internal fun circleDiameter(radius: Double): Double = 2 * radius
+```
+
 
 Теперь в другом пакете:
 
-kotlin
-
+```kotlin
 // main.kt
 package main
 import geometry.rectangleArea
@@ -135,9 +140,11 @@ import geometry.safeRectangleArea
 // import geometry.validatePositive     // Ошибка: private, недоступен
 // import geometry.circleDiameter       // Ошибка: internal, если main.kt в другом модуле
 fun main() {
-println(rectangleArea(4.0, 5.0))        // OK
-println(safeRectangleArea(4.0, 5.0))    // OK
+    println(rectangleArea(4.0, 5.0))        // OK
+    println(safeRectangleArea(4.0, 5.0))    // OK
 }
+
+```
 
 Если `main.kt` находится в том же модуле компиляции, `internal` функция `circleDiameter` будет доступна.
 
@@ -154,6 +161,24 @@ println(safeRectangleArea(4.0, 5.0))    // OK
 
 ---
 
+## Практическое задание
+
+1. Создайте проект с двумя пакетами: `utils` и `app`.
+
+2. В пакете `utils` напишите функции:
+
+    - `fun formatPrice(amount: Double): String` — public, возвращает строку вида "$X.XX".
+
+    - `private fun roundToCents(amount: Double): Double` — округляет до двух знаков.
+
+    - `internal fun applyDiscount(amount: Double, discount: Double): Double` — вычисляет цену со скидкой.
+
+3. В пакете `app` в функции `main` используйте `formatPrice` и попробуйте вызвать `applyDiscount`. Объясните, почему вторая функция может быть недоступна.
+
+4. Сделайте так, чтобы `applyDiscount` была доступна внутри `app` — для этого потребуется разместить `app` в том же модуле компиляции (например, в одном проекте) или изменить видимость.
+
+
+---
 
 ## Итоги
 
